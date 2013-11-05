@@ -1,0 +1,240 @@
+declare -A color
+color["Black"]="\e[0;30m"
+color["Blue"]="\\e[0;34m"
+color["Green"]="\e[0;32m"
+color["Cyan"]="\e[0;36m"
+color["Red"]="\e[0;31m"
+color["Purple"]="\e[0;35m"
+color["Yellow"]="\e[1;33m"
+color["Brown"]="\e[0;33m"
+color["White"]="\e[1;37m"
+color["LightCyan"]="\e[1;36m"
+color["DarkGray"]="\e[1;30m"
+color["LightBlue"]="\e[1;34m"
+color["LightGreen"]="\e[1;32m"
+color["LightRed"]="\e[1;31m"
+color["LightPurple"]="\e[1;35m"
+color["LightGray"]="\e[0;37m"
+color["clear"]="\e[0;00m"
+
+function colorMe() 
+{
+	echo -e "${color[$1]}$2"
+}
+
+function isGit() 
+{
+	[ ! -f /usr/bin/git ] && return
+
+	ingit=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+	[ -z $ingit ] && return
+	branch=$(git rev-parse --abbrev-ref HEAD)
+	if [ ! -z $ingit ] && [ $ingit = "true" ]; then 
+		#echo -e "$(colorMe Green)\xe2\x88\x80::$(colorMe Cyan ${branch})::$(colorMe clean)"
+		echo -e "::$(colorMe Cyan ${branch})$(colorMe clear ::)"
+	fi
+
+}
+
+function trim_file() {
+	[ $# -lt 1 ] && echo "Too few arguments" && return
+
+	[ $# -eq 1 ] && {
+		[ ! -f $1 ] && echo "Not a file" && return
+		# remove only one line
+		sed '$d' -i $1
+		return
+	}
+
+	[ $# -eq 2 ] && {
+		[ ! -f "$1" ] && [ ! -f "$2" ] && echo "Missing a file" && return
+
+		inFile=""
+		numLines=0
+		if [ -f "$1" ] ; then 
+			inFile="$1" ; numLines=$2 
+		else
+			inFile="$2" ; numLines=$1
+		fi
+		echo "F: " $inFile
+		echo "N: " $numLines
+		[[ $numLines != ?([0-9]) ]] && echo "$numLines ain't a number" && return
+		total=$(wc -l $inFile | cut -d ' ' -f 1)
+		fstart=$((1+$total-$numLines))
+		echo "sed \"$fstart,\$"
+		sed "$fstart,\$d" -i $inFile
+	}
+}
+
+gr() {
+    [ $# -lt 1 ] && return
+    git rebase origin/$1
+}
+
+function usbOff() 
+{
+	sudo umount /mnt/$1
+}
+
+function usbOn() 
+{
+	[[ ! -d /mnt/$1 ]] && sudo mkdir /mnt/$1
+	sudo mount -o uid=1000 /dev/$1 /mnt/$1
+}
+
+function githttp2ssh() {
+	var="$@"
+	cmd=$(echo $var|sed 's/https/ssh/'|sed 's/it.de\/gerrit/it.de:4040/')
+	echo $cmd
+	fetch=$(echo $cmd | sed 's/\&.*//')
+	co=$(echo $cmd | sed 's/.*\&//')
+	$fetch && $co
+}
+
+function genCtags()
+{
+	find -name \*.c -or -name \*.h | ctags --extra=+f -L -
+}
+
+function genCpptags()
+{
+	find -name \*.cc -or -name \*.cpp -or -name \*.hh -or -name \*.h | ctags --extra=+f -L -
+}
+
+
+function listThem()
+{
+	hci="hci1"
+	[ ! -z $1 ] && hci="$1"
+	sudo hciconfig $hci up
+
+	qdbus --system org.bluez /org/bluez/hci1/dev_CC_08_E0_81_7B_73 org.bluez.Device1.Connect
+	qdbus --system org.bluez /org/bluez/hci1/dev_CC_08_E0_81_7B_73/player0 org.bluez.MediaPlayer1.ListFolder
+
+}
+
+function bluez_go()
+{
+	bluez4="sudo /home/aantonop/src/bmw/bluez.4.102/src/bluetoothd -dn"
+	bluez5="sudo /home/aantonop/src/oss/bluez/src/bluetoothd -dnE"
+	cmd=$bluez4
+	[[ $# -eq 1  && $1 -eq 5 ]] && cmd=$bluez5
+
+	eval $cmd
+}
+
+function fincher()
+{
+	sleep 2
+	terminator --title=finch -x finch
+}
+
+function to()
+{
+	local wdirs=~/.workdirs
+	# no args. do nothing and quit silently
+	[ $# -lt 1 ] && return 1
+	dst=$1
+	
+	if [[ $dst == "register" ]] ; 
+	then
+		name=$2
+		if [ -z $2 ] ; then
+			name=$(basename $(pwd))
+		fi
+
+		egrep -q "^${name}" ~/.workdirs && echo "Alias exists" && return
+		echo "Registering $(pwd) with alias $name"
+		echo "$name $(pwd)" >> ~/.workdirs
+		return
+	fi
+	# is there a conf file?
+	[[ ! -f $wdirs ]] && return 2
+
+	# make sure the destination exists in our rc
+	egrep -q "^$dst" $wdirs || return 4
+	
+	# we need a dictionary with the necessary paths
+	declare -A workdirs
+	while read a ; do
+		IFS=" " read -a pair <<< $a
+		workdirs[${pair[0]}]=${pair[1]}
+	done < $wdirs
+
+	pushd ${workdirs[$dst]}
+}
+
+function cbuild()
+{
+	dir=build
+	target=""
+	clean=0
+
+	local OPTIND
+	cmake_args=""
+	while getopts D:d:t:ch OPTION
+	do
+		case $OPTION in
+			d)
+				dir=$OPTARG
+				;;
+			t)
+				target=$OPTARG
+				;;
+			D)
+				cmake_args="$cmake_args -D$OPTARG"
+				;;
+			c)
+				clean=1
+				;;
+			h)
+				echo "cbuild -d <build_dir> -t <make_target>"
+				echo "defaults will be used if either or all of the arguments"
+				echo "aren't specified (build_dir:build make_target:\"\")"
+				return
+				;;
+		esac
+	done
+	shift $(($OPTIND-1))
+	echo "CMAKE ARGS:: " $cmake_args
+
+	[ ! -f CMakeLists.txt ] && echo "Not a cmake project" && return 1
+
+	[ ! -d ./$dir ] && mkdir $dir
+
+	[ -d ./$dir ] && [ $clean -eq 1 ] && echo "CLEANING" && rm -rf ${dir}/*
+
+	pushd $dir
+	echo "cmake .. make $target"
+	cmake $cmake_args .. && make $target
+	popd
+}
+
+function gitFetchGerrit()
+{
+	[ -z $1 ] && echo "Missing change id" && return
+	fetch=$(git ls-remote ag refs/changes/*${1}* | cut -f 2 | tail -n 1)
+	echo $fetch
+	git fetch ag $fetch
+	return $1
+}
+
+function gitRev2Br()
+{
+	id=$(git describe --all FETCH_HEAD)
+	author=$(git show -s --format=%ae FETCH_HEAD)
+
+	echo "$id,$author"
+	author=$(echo $author | sed 's/@.*//')
+
+	git co -b review/${author}/${id} FETCH_HEAD
+}
+
+function gitFetch2Br()
+{
+	[ -z $1 ] && echo "Missing change id" && return -1
+	fetchName=$(eval gitFetchGerrit $1)
+
+	author=$(git show -s --format=%ae FETCH_HEAD | sed 's/@.*//')
+
+}
