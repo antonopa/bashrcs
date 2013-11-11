@@ -253,5 +253,5 @@ function gitFetch2Br()
 
 	author=$(git show -s --format=%ae FETCH_HEAD | sed 's/@.*//')
 
-	git co -b reviews/${fetchName}/${author} FETCH_HEAD
+	git co -b reviews/${author}/${fetchName} FETCH_HEAD
 }
