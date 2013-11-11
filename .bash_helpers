@@ -1,6 +1,6 @@
 declare -A color
 color["Black"]="\e[0;30m"
-color["Blue"]="\\e[0;34m"
+color["Blue"]="\e[0;34m"
 color["Green"]="\e[0;32m"
 color["Cyan"]="\e[0;36m"
 color["Red"]="\e[0;31m"
@@ -164,15 +164,27 @@ function to()
 	pushd ${workdirs[$dst]}
 }
 
+function err()
+{
+	echo -e "\e[1;31m$@\e[0;00m"
+}
+
+function msg() 
+{
+	echo -e "\e[0;32m$@\e[0;00m"
+}
 function cbuild()
 {
 	dir=build
 	target=""
 	clean=0
 
+	[ -f ~/.cbuild.conf ] && source ~/.cbuild.conf
+	msg "using defaults: " $defargs
+
 	local OPTIND
 	cmake_args=""
-	while getopts D:d:t:ch OPTION
+	while getopts D:d:t:chi OPTION
 	do
 		case $OPTION in
 			d)
@@ -183,6 +195,10 @@ function cbuild()
 				;;
 			D)
 				cmake_args="$cmake_args -D$OPTARG"
+				;;
+			i)
+				#ignore default args
+				[ ! -z defargs ] && unset defargs
 				;;
 			c)
 				clean=1
@@ -196,16 +212,16 @@ function cbuild()
 		esac
 	done
 	shift $(($OPTIND-1))
-	echo "CMAKE ARGS:: " $cmake_args
 
-	[ ! -f CMakeLists.txt ] && echo "Not a cmake project" && return 1
+	[ ! -f CMakeLists.txt ] && err "Not a cmake project" && return 1
 
 	[ ! -d ./$dir ] && mkdir $dir
 
-	[ -d ./$dir ] && [ $clean -eq 1 ] && echo "CLEANING" && rm -rf ${dir}/*
+	[ -d ./$dir ] && [ $clean -eq 1 ] && msg "Cleaning old ${dir}" && rm -rf ${dir}/*
 
+	[ ! -z $defargs ] && cmake_args=$cmake_args" "$defargs
 	pushd $dir
-	echo "cmake .. make $target"
+	msg "cmake $cmake_args .. make $target"
 	cmake $cmake_args .. && make $target
 	popd
 }
@@ -237,4 +253,5 @@ function gitFetch2Br()
 
 	author=$(git show -s --format=%ae FETCH_HEAD | sed 's/@.*//')
 
+	git co -b reviews/${fetchName}/${author} FETCH_HEAD
 }
