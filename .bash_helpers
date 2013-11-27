@@ -145,7 +145,7 @@ function to()
 
 		egrep -q "^${name}" ~/.workdirs && echo "Alias exists" && return
 		echo "Registering $(pwd) with alias $name"
-		echo "$name $(pwd)" >> ~/.workdirs
+		echo "$name $(pwd)" >> $wdirs
 		return
 	fi
 	# is there a conf file?
@@ -173,18 +173,21 @@ function msg()
 {
 	echo -e "\e[0;32m$@\e[0;00m"
 }
+
 function cbuild()
 {
 	dir=build
 	target=""
 	clean=0
-
+	just_cmake=0
+	verbose=0
+	cmake_args=""
+	
 	[ -f ~/.cbuild.conf ] && source ~/.cbuild.conf
 	msg "using defaults: " $defargs
 
 	local OPTIND
-	cmake_args=""
-	while getopts D:d:t:chi OPTION
+	while getopts D:d:t:chibv OPTION
 	do
 		case $OPTION in
 			d)
@@ -193,12 +196,18 @@ function cbuild()
 			t)
 				target=$OPTARG
 				;;
+			b)
+				just_cmake=1
+				;;
 			D)
 				cmake_args="$cmake_args -D$OPTARG"
 				;;
 			i)
 				#ignore default args
 				[ ! -z defargs ] && unset defargs
+				;;
+			v)
+				verbose=1
 				;;
 			c)
 				clean=1
@@ -219,10 +228,16 @@ function cbuild()
 
 	[ -d ./$dir ] && [ $clean -eq 1 ] && msg "Cleaning old ${dir}" && rm -rf ${dir}/*
 
+	[ $verbose -eq 1 ] && target=$target" VERBOSE=1"
+
 	[ ! -z $defargs ] && cmake_args=$cmake_args" "$defargs
 	pushd $dir
-	msg "cmake $cmake_args .. make $target"
-	cmake $cmake_args .. && make $target
+	msg "cmake $cmake_args .. && make $target"
+	if [ $just_cmake -eq 1 ] ; then
+		cmake $cmake_args ..
+	else
+		cmake $cmake_args .. && make $target
+	fi
 	popd
 }
 
