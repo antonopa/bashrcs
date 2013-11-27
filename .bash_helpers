@@ -28,7 +28,7 @@ function isGit()
 
 	ingit=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 	[ -z $ingit ] && return
-	branch=$(git rev-parse --abbrev-ref HEAD)
+	branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 	if [ ! -z $ingit ] && [ $ingit = "true" ]; then 
 		#echo -e "$(colorMe Green)\xe2\x88\x80::$(colorMe Cyan ${branch})::$(colorMe clean)"
 		echo -e "::$(colorMe Cyan ${branch})$(colorMe clear ::)"
