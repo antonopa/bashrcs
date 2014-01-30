@@ -273,3 +273,24 @@ function gitFetch2Br()
 
 	git co -b reviews/${author}/${fetchName} FETCH_HEAD
 }
+
+function netflixPinger()
+{
+	dir="."
+	[ ! -z $1 ] && dir="$1"
+
+	r=$RANDOM
+	'grep' -h remote ${dir}/USA*ovpn | cut -d' ' -f 2 > /tmp/res.${r}
+
+	(while read a; do ping -c 1 $a > /tmp/${r}.${a}.res & done < /tmp/res.${r} )
+	echo -n "Wait"
+	for i in `seq 1 5`; do echo -n "." ; sleep 1; done
+
+	ip=$('grep' "^64" -h /tmp/${r}.*.res | sort -t'=' -k 4 -n -r | tail -n 1|sed 's/.*from \(.*\):.*/\1/')
+	echo $ip
+
+	grep ${ip} ${dir}/*ovpn
+
+	rm /tmp/res.${r}
+	rm /tmp/${r}*res
+}
