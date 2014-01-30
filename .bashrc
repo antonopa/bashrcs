@@ -158,3 +158,5 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 
 export GEM_HOME="/home/aantonop/.gem/ruby/2.0.0"
 export PATH=$PATH:${GEM_HOME}/bin
+
+complete -cf sudo
