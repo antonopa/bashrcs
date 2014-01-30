@@ -33,3 +33,6 @@ alias findBigs="du -sh * .[a-zA-Z]*|grepSize"
 alias gdb="gdb -q"
 
 alias remake="make clean && make"
+
+alias forkub='VBoxManage startvm ub --type headless'
+alias unforkub='VBoxManage controlvm ub powreoff'
