@@ -187,11 +187,11 @@ function cbuild()
 	msg "using defaults: " $defargs
 
 	local OPTIND
-	while getopts D:d:t:chibv OPTION
+	while getopts D:t:cdhibv OPTION
 	do
 		case $OPTION in
 			d)
-				dir=$OPTARG
+				cmake_args="$cmake_args -DCMAKE_BUILD_TYPE=Debug"
 				;;
 			t)
 				target=$OPTARG
@@ -200,6 +200,9 @@ function cbuild()
 				just_cmake=1
 				;;
 			D)
+				# we need at least one space in defargs for this to work.
+				[[ $defargs != *' '* ]] && defargs=${defargs}" "
+				[[ $OPTARG == CMAKE_INSTALL_PREFIX* ]] && defargs=${defargs/-DCMAKE_INSTALL_PREFIX* /}
 				cmake_args="$cmake_args -D$OPTARG"
 				;;
 			i)
