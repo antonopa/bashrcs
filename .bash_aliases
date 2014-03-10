@@ -36,3 +36,5 @@ alias remake="make clean && make"
 
 alias forkub='VBoxManage startvm ub --type headless'
 alias unforkub='VBoxManage controlvm ub powreoff'
+
+alias pcat='pygmentize'

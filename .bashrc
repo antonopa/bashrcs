@@ -139,7 +139,7 @@ export PERL_LOCAL_LIB_ROOT="/home/aantonop/perl5";
 export PERL_MB_OPT="--install_base /home/aantonop/perl5";
 export PERL_MM_OPT="INSTALL_BASE=/home/aantonop/perl5";
 export PERL5LIB="/home/aantonop/perl5/lib/perl5/x86_64-linux-thread-multi:/home/aantonop/perl5/lib/perl5";
-export PATH="/home/aantonop/perl5/bin:$PATH";
+export PATH="/home/aantonop/perl5/bin:$PATH:/home/aantonop/.gem/ruby/2.1.0/bin";
 
 
 export christian="christian.fetzer@bmw-carit.de"
