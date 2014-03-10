@@ -91,7 +91,7 @@ if [ "$color_prompt" = yes ]; then
 #PS1='\n\[\033[01;31m\]-- ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\] : \[\033[01;33m\]$(isGit)\n\[\033[01;31m\]|_\[\033[01;34m\] \[\033[01;34m\]\w - \[\033[01;32m\]\#\n\[\033[00m\] '
 #PS1=$'[$(colorMe Blue \u)$(colorMe clear)\xe2\x88\x9e$(colorMe Cyan \h)$(colorMe clear ])[$(colorMe LightGreen \#)$(colorMe clear ]) $ '
 PS1=$'[$(colorMe Blue \u)] $ $(colorMe clear) \
-$(isGit) \
+	$(isGit) $(colorMe White):$(gitHeadCommit):\
 $(colorMe LightGreen \xe2\x86\xb3) $(colorMe "LightBlue")\w \n $(colorMe LightGray \xe2\x88\xb4) $(colorMe clear) \[\033[00m\] '
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
