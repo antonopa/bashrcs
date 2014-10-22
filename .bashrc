@@ -88,8 +88,6 @@ if [ -f ~/.bash_helpers ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-#PS1='\n\[\033[01;31m\]-- ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\] : \[\033[01;33m\]$(isGit)\n\[\033[01;31m\]|_\[\033[01;34m\] \[\033[01;34m\]\w - \[\033[01;32m\]\#\n\[\033[00m\] '
-#PS1=$'[$(colorMe Blue \u)$(colorMe clear)\xe2\x88\x9e$(colorMe Cyan \h)$(colorMe clear ])[$(colorMe LightGreen \#)$(colorMe clear ]) $ '
 PS1=$'[$(colorMe Blue \u)] $ $(colorMe clear) \
 	$(isGit) $(colorMe White):$(gitHeadCommit):\
 $(colorMe LightGreen \xe2\x86\xb3) $(colorMe "LightBlue")\w \n $(colorMe LightGray \xe2\x88\xb4) $(colorMe clear) \[\033[00m\] '
@@ -111,29 +109,18 @@ fi
 export JAVA_HOME="/opt/java"
 export JAVA="/opt/java/bin/java"
 
-export PATH=$PATH:/bin:/sbin:$HOME/bin:/opt/java/bin
+export PATH=$HOME/bin:$PATH:/bin:/sbin:/opt/java/bin
 
 COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
 COMP_WORDBREAKS=${COMP_WORDBREAKS//\$/}
 
-
 source /usr/share/doc/pkgfile/command-not-found.bash
 
 export EDITOR='vim'
-
-export btzm='B4:EE:D4:E6:4B:8F'
-export btn500='A0:F4:19:4C:17:76'
-export iph='CC:08:E0:81:7B:73'
-export sgn='38:16:D1:88:B6:AF'
-export refPlatform='00:09:DD:50:8D:25'
-
 export BROWSER='firefox'
 
 [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx
 [[ -z $DISPLAY && $XDG_VTNR -eq 7 ]] && exec startx
-
-export CC=gcc
-
 
 export PERL_LOCAL_LIB_ROOT="/home/aantonop/perl5";
 export PERL_MB_OPT="--install_base /home/aantonop/perl5";
@@ -141,19 +128,10 @@ export PERL_MM_OPT="INSTALL_BASE=/home/aantonop/perl5";
 export PERL5LIB="/home/aantonop/perl5/lib/perl5/x86_64-linux-thread-multi:/home/aantonop/perl5/lib/perl5";
 export PATH="/home/aantonop/perl5/bin:$PATH:/home/aantonop/.gem/ruby/2.1.0/bin";
 
-
-export christian="christian.fetzer@bmw-carit.de"
-export philip="philip.lorenz@bmw-carit.de"
-export boss="thomas.boss@bmw-carit.de"
-export mastiz="mikel.astiz@bmw-carit.de"
-export me="antonopa@gmail.com"
-
 export bluez="linux-bluetooth@vger.kernel.org"
 
 source ~/.bash_format_patch
-source ~/arc/arcanist/resources/shell/bash-completion
 
-export PYTHONPATH="/home/aantonop/lib/python2.7"
 export _JAVA_AWT_WM_NONREPARENTING=1
 
 export GEM_HOME="/home/aantonop/.gem/ruby/2.0.0"

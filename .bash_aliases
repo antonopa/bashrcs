@@ -18,7 +18,7 @@ alias whatsplayin='banshee --query-artist --query-title'
 alias sacman='sudo pacman'
 alias make='make -j16'
 
-alias grep='grep -I --exclude=tags --color=auto -n'
+alias grep='grep -I --exclude=tags --exclude-dir=.git --color=auto -n'
 alias egrep='egrep -I --exclude=tags --color=auto -n'
 
 alias sdbus='dbus --system'
@@ -38,3 +38,12 @@ alias forkub='VBoxManage startvm ub --type headless'
 alias unforkub='VBoxManage controlvm ub powreoff'
 
 alias pcat='pygmentize'
+
+alias mucmount='sudo mount -t cifs //192.168.100.200/Projects /media/mucdc01 -o credentials=/root/.servercred,uid=1000'
+
+alias er='sudo systemctl restart dhcpcd@eth0'
+alias ws='sudo systemctl start dhcpcd@wlan0'
+
+alias ooooh='sudo history -p \!-1'
+
+alias aus='sudo poweroff'
