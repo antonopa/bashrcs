@@ -58,6 +58,16 @@ print_color_palette()
     done
 }
 
+stopwatch(){
+    # stopwatch counter. Copied as it is from: http://goo.gl/0V3Zlc
+    date1=`date +%s`;
+    while true
+    do
+        echo -ne "$(date -u --date @$((`date +%s` - $date1)) +%H:%M:%S)\r";
+        sleep 0.1
+    done
+}
+
 to()
 {
     local wdirs=~/.workdirs
