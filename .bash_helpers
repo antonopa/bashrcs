@@ -68,6 +68,13 @@ stopwatch(){
     done
 }
 
+bbshell() {
+    curd=$(pwd)
+    cd /opt/src/base
+    ./bci-build-scripts/build.sh --bitbake-shell
+    cd ${curd}
+}
+
 to()
 {
     local wdirs=~/.workdirs
@@ -92,11 +99,17 @@ to()
             echo "Registering $(pwd) with alias $name"
             echo "$name $(pwd)" >> $wdirs
         fi
+
+        sort $wdirs -o $wdirs
         return
     fi
+
     # is there a conf file?
     [[ ! -f $wdirs ]] && return 2
 
+    # if there's a directory in the current directory with the same name as our alias
+    # auto completion adds a trailing / thus failing the grep below. Strip it.
+    dst=${dst%/}
     # make sure the destination exists in our rc
     egrep -q "^$dst" $wdirs || return 4
 

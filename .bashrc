@@ -24,7 +24,8 @@ HISTFILESIZE=2000
 shopt -s checkwinsize
 
 PATH=$PATH:/bin:/usr/sbin:/sbin
-[[ -d ~/bin ]] && PATH=$PATH:~/bin
+[[ -d ~/bin ]] && PATH=~/bin:$PATH
+[[ -d ~/.local/bin ]] && PATH=$PATH:~/.local/bin
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
 #shopt -s globstar
@@ -44,34 +45,17 @@ esac
 
 unset color_prompt force_color_prompt
 
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
-
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    #alias grep='grep --color=auto'
-    #alias fgrep='fgrep --color=auto'
-    #alias egrep='egrep --color=auto'
 fi
 
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+# liquid prompt settings
+[[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -87,22 +71,15 @@ if ! shopt -oq posix; then
   fi
 fi
 
-if [ -f ~/.bash_helpers ]; then
-    . ~/.bash_helpers
-fi
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
-
-
-[[ -f /etc/bash_completion.d/git-prompt ]] && source /etc/bash_completion.d/git-prompt
+[ -f ~/.bash_helpers ] && source ~/.bash_helpers
+[ -f ~/.bash_aliases ] && source ~/.bash_aliases
+[ -f /etc/bash_completion.d/git-prompt ] && source /etc/bash_completion.d/git-prompt
 
 export TERM=xterm-256color
 export EDITOR=vim
-export PYTHONPATH=${PYTHONPATH}:/opt/src/swcat
 
-[[ $- = *i* ]] && source ~/.liquidprompt/liquidprompt
+complete -cf sudo
 
+#startx once
+[[ -z "$DISPLAY" && "$XDG_VTNR" -eq 1 && -z "$SSH_TTY" && -z "$TMUX" ]] && exec startx
 set -o vi
-
